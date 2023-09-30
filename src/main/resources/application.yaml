@@ -1,8 +1,20 @@
+server:
+  port: 8081
+
 spring:
+  application:
+    name: priori-task
   datasource:
-    url: jdbc:postgresql://localhost:5432/mydb
-    username: myuser
-    password: mypassword
+    url: ${ENV_DATASOURCE_URL:jdbc:postgresql://localhost:5432/mydb}
+    username: ${ENV_DATASOURCE_USERNAME:myuser}
+    password: ${ENV_DATASOURCE_PASSWORD:mypassword}
   jpa:
+    show-sql: false
     hibernate:
       ddl-auto: update
+
+security:
+  jwt:
+    cookieName: prioriTask
+    secret: ${ENV_JWT_SECRET}
+    expirationMs: 86400000
