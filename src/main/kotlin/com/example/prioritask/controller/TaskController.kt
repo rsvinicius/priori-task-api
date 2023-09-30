@@ -1,9 +1,10 @@
 package com.example.prioritask.controller
 
-import com.example.prioritask.model.dto.TaskDto
+import com.example.prioritask.model.request.TaskRequest
+import com.example.prioritask.model.request.UpdateTaskRequest
+import com.example.prioritask.model.response.TaskResponse
 import com.example.prioritask.service.TaskService
-import com.example.prioritask.model.dto.OnCreate
-import com.example.prioritask.model.dto.OnUpdate
+import jakarta.validation.Valid
 import jakarta.validation.constraints.Positive
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -26,28 +27,26 @@ import org.springframework.web.bind.annotation.RestController
 class TaskController(private val taskService: TaskService) {
 
     @PostMapping
-    @Validated(OnCreate::class)
-    fun createTask(@RequestBody taskDto: TaskDto): TaskDto {
-        return taskService.createTask(taskDto)
+    fun createTask(@Valid @RequestBody taskRequest: TaskRequest): TaskResponse {
+        return taskService.createTask(taskRequest)
     }
 
     @GetMapping
-    fun listTasks(@PageableDefault(size = 10) pageable: Pageable): Page<TaskDto> {
+    fun listTasks(@PageableDefault(size = 10) pageable: Pageable): Page<TaskResponse> {
         return taskService.listTasks(pageable)
     }
 
     @GetMapping("/{id}")
-    fun getTaskById(@PathVariable @Positive id: Long): TaskDto {
+    fun getTaskById(@PathVariable @Positive id: Long): TaskResponse {
         return taskService.getTaskById(id)
     }
 
     @PutMapping("/{id}")
-    @Validated(OnUpdate::class)
     fun updateTaskById(
         @PathVariable @Positive id: Long,
-        @RequestBody taskDto: TaskDto
-    ): TaskDto {
-        return taskService.updateTask(id, taskDto)
+        @Valid @RequestBody updateTaskRequest: UpdateTaskRequest
+    ): TaskResponse {
+        return taskService.updateTask(id, updateTaskRequest)
     }
 
     @DeleteMapping("/{id}")

@@ -1,4 +1,4 @@
-package com.example.prioritask.util.enum
+package com.example.prioritask.model.enums
 
 enum class TaskPriorityEnum {
     NONE,

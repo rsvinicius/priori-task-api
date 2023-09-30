@@ -1,6 +1,6 @@
 package com.example.prioritask.model.entity
 
-import com.example.prioritask.util.enum.TaskPriorityEnum
+import com.example.prioritask.model.enums.TaskPriorityEnum
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
@@ -15,22 +15,18 @@ import java.time.LocalDate
 data class Task(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long,
-
+    val id: Long = 0,
     var title: String,
-
     var description: String?,
-
     var dueDate: LocalDate?,
-
     @Enumerated(EnumType.STRING)
     var priority: TaskPriorityEnum,
-
     @ManyToOne
     @JoinColumn(name = "user_id")
-    var account: Account,
-
+    var user: User,
     @ManyToOne
     @JoinColumn(name = "category_id")
     var category: Category?
-)
+){
+    constructor() : this(0, "", null, null, TaskPriorityEnum.NONE, User(), null)
+}
