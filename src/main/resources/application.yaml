@@ -5,13 +5,33 @@ spring:
   application:
     name: priori-task
   datasource:
-    url: ${ENV_DATASOURCE_URL:jdbc:postgresql://localhost:5432/mydb}
-    username: ${ENV_DATASOURCE_USERNAME:myuser}
-    password: ${ENV_DATASOURCE_PASSWORD:mypassword}
+    url: ${ENV_DATASOURCE_URL}
+    username: ${ENV_DATASOURCE_USERNAME}
+    password: ${ENV_DATASOURCE_PASSWORD}
   jpa:
     show-sql: false
     hibernate:
       ddl-auto: update
+  quartz:
+    job-store-type: jdbc
+    properties:
+      org:
+        quartz:
+          jobStore:
+            dataSource: postgresql
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+          scheduler:
+            instanceName: EmailScheduler
+          threadPool:
+            threadCount: 5
+          dataSource:
+            postgresql:
+              URL: ${ENV_DATASOURCE_URL}
+              username: ${ENV_DATASOURCE_USERNAME}
+              password: ${ENV_DATASOURCE_PASSWORD}
+              driver: org.postgresql.Driver
+              provider: hikaricp
+              maxConnections: 8
 
 security:
   jwt:

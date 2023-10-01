@@ -42,6 +42,7 @@ class JwtUtils(
             .path("/api")
             .maxAge(COOKIE_DURATION_IN_SECONDS)
             .httpOnly(true)
+            .secure(true)
             .build()
     }
 
