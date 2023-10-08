@@ -13,11 +13,12 @@ data class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
+    val fullName: String,
     @Column(unique = true)
     val username: String,
     @Column(unique = true)
     val email: String,
     val password: String
-) {
-    constructor() : this(0, "", "", "")
+) : Auditable() {
+    constructor() : this(0, "", "", "", "")
 }

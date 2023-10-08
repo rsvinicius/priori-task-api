@@ -27,6 +27,6 @@ data class Task(
     @ManyToOne
     @JoinColumn(name = "category_id")
     var category: Category?
-){
+) : Auditable() {
     constructor() : this(0, "", null, null, TaskPriorityEnum.NONE, User(), null)
 }
