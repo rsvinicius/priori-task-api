@@ -1,4 +1,4 @@
-package com.example.prioritask.model.constants
+package com.example.prioritask.model.constant
 
 object ResponseBodyConstants {
     const val USERNAME_ALREADY_TAKEN = "Username is already taken."

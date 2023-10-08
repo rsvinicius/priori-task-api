@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Task Reminder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            background-color: #007bff;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        p {
+            margin: 10px 0;
+        }
+        .thank-you {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<h1>Task Reminder</h1>
+<div class="container">
+    <p>Hello <span th:text="${fullName}"></span>,</p>
+
+    <p>This is a reminder for your task:</p>
+
+    <p><strong>Task Title:</strong> <span th:text="${taskTitle}"></span></p>
+    <p><strong>Due Date:</strong> <span th:text="${dueDate}"></span></p>
+
+    <p>Don't forget to complete it on time!</p>
+
+    <p class="thank-you">Thank you for using PrioriTask!</p>
+</div>
+</body>
+</html>

@@ -38,3 +38,11 @@ security:
     cookieName: prioriTask
     secret: ${ENV_JWT_SECRET}
     expirationMs: 86400000
+
+email:
+  senderName: PrioriTask
+  hostName: smtp.googlemail.com
+  smtpPort: 465
+  auth:
+    username: ${ENV_EMAIL_AUTH_USERNAME}
+    password: ${ENV_EMAIL_AUTH_PASSWORD}

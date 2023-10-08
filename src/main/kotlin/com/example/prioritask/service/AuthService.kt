@@ -1,9 +1,9 @@
 package com.example.prioritask.service
 
-import com.example.prioritask.model.constants.ResponseBodyConstants.EMAIL_ALREADY_TAKEN
-import com.example.prioritask.model.constants.ResponseBodyConstants.USERNAME_ALREADY_TAKEN
-import com.example.prioritask.model.constants.ResponseBodyConstants.USER_REGISTERED
-import com.example.prioritask.model.constants.ResponseBodyConstants.USER_SIGNED_OUT
+import com.example.prioritask.model.constant.ResponseBodyConstants.EMAIL_ALREADY_TAKEN
+import com.example.prioritask.model.constant.ResponseBodyConstants.USERNAME_ALREADY_TAKEN
+import com.example.prioritask.model.constant.ResponseBodyConstants.USER_REGISTERED
+import com.example.prioritask.model.constant.ResponseBodyConstants.USER_SIGNED_OUT
 import com.example.prioritask.model.entity.User
 import com.example.prioritask.model.request.AuthenticationRequest
 import com.example.prioritask.model.request.RegistrationRequest
@@ -43,7 +43,7 @@ class AuthService private constructor(
     }
 
     fun registerUser(registrationRequest: RegistrationRequest): ResponseEntity<String> {
-        if(userRepository.existsByUsername(registrationRequest.username)) {
+        if(userRepository.existsByUsername(registrationRequest.fullName)) {
             return ResponseEntity.badRequest().body(USERNAME_ALREADY_TAKEN)
         }
 
@@ -52,6 +52,7 @@ class AuthService private constructor(
         }
 
         val user = User(
+            fullName = registrationRequest.fullName,
             username = registrationRequest.username,
             password = encoder.encode(registrationRequest.password),
             email = registrationRequest.email

@@ -21,6 +21,10 @@ class UserDetailsImpl(private val user: User) : UserDetails {
         return user.id
     }
 
+    fun getFullName(): String {
+        return user.fullName
+    }
+
     fun getEmail(): String {
         return user.email
     }

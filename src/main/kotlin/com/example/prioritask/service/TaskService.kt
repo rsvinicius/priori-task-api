@@ -1,50 +1,54 @@
 package com.example.prioritask.service
 
-import com.example.prioritask.exception.UnauthorizedUserException
-import com.example.prioritask.model.request.TaskRequest
 import com.example.prioritask.model.entity.Task
+import com.example.prioritask.model.request.TaskRequest
 import com.example.prioritask.model.request.UpdateTaskRequest
 import com.example.prioritask.model.response.TaskResponse
 import com.example.prioritask.repository.CategoryRepository
 import com.example.prioritask.repository.TaskRepository
-import com.example.prioritask.repository.UserRepository
-import com.example.prioritask.security.UserDetailsImpl
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
+
 @Service
 class TaskService(
     private val categoryRepository: CategoryRepository,
-    private val userRepository: UserRepository,
+    private val userService: UserService,
+    private val scheduleService: ScheduleService,
     private val taskRepository: TaskRepository,
     private val objectMapper: ObjectMapper
 ) {
     fun createTask(taskRequest: TaskRequest): TaskResponse {
+        val user = userService.getUserBySecurityContext()
+
         val task = Task(
             title = taskRequest.title,
             description = taskRequest.description,
             dueDate = taskRequest.dueDate,
             priority = taskRequest.priority,
-            user = userRepository.findUserById(getUserId()),
+            user = user,
             category = taskRequest.categoryId?.let { categoryRepository.findCategoryById(it) }
         )
 
         val savedTask = taskRepository.save(task)
+
+        savedTask.dueDate?.let {
+            scheduleService.scheduleTaskReminder(user.id, savedTask.id, it)
+        }
 
         return convertTaskToTaskResponse(savedTask)
     }
 
     fun listTasks(pageable: Pageable): Page<TaskResponse> {
         return taskRepository
-            .findAllByUser(pageable, userRepository.findUserById(getUserId()))
+            .findAllByUser(pageable, userService.getUserBySecurityContext())
             .map { task -> convertTaskToTaskResponse(task) }
     }
 
-    fun getTaskById(id: Long): TaskResponse {
-        val task = findTaskById(id)
+    fun getTaskById(taskId: Long): TaskResponse {
+        val task = findTaskById(taskId)
 
         return convertTaskToTaskResponse(task)
     }
@@ -62,6 +66,10 @@ class TaskService(
 
         val savedTask = taskRepository.save(task)
 
+        if (savedTask.dueDate != null && updateTaskRequest.dueDate != null) {
+            scheduleService.rescheduleTrigger(id, updateTaskRequest.dueDate)
+        }
+
         return convertTaskToTaskResponse(savedTask)
     }
 
@@ -69,30 +77,20 @@ class TaskService(
         val task = findTaskById(id)
 
         taskRepository.delete(task)
+
+        scheduleService.deleteJobByTaskId(task.id)
     }
 
-    private fun checkUserIdConsistency(id: Long) {
-        if (id != getUserId()) {
-            throw UnauthorizedUserException("This task belongs to another user")
-        }
-    }
-
-    private fun findTaskById(id: Long): Task {
+    fun findTaskById(id: Long, userId: Long? = null): Task {
         val task = taskRepository.findById(id).orElseThrow {
-            EntityNotFoundException("No Task found with the provided Task id")
+            EntityNotFoundException("No task found with the provided Task id")
         }
 
-        checkUserIdConsistency(task.user.id)
+        userService.checkUserIdConsistency(task.user.id, userId)
 
         return task
     }
 
     private fun convertTaskToTaskResponse(task: Task): TaskResponse =
         objectMapper.convertValue(task, TaskResponse::class.java)
-
-    private fun getUserId(): Long {
-        val userDetails = SecurityContextHolder.getContext().authentication.principal as UserDetailsImpl
-        return userDetails.getId()
-    }
 }
-
